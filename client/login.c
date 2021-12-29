@@ -103,7 +103,7 @@ gboolean check_login(void *param)
 
 void init_login_window()
 {
-    GtkBuilder *builder = gtk_builder_new_from_resource("/org/gtk/client/login.glade");
+    GtkBuilder *builder = gtk_builder_new_from_file("./client/login.glade");
 
     loginWindow = GTK_WIDGET(gtk_builder_get_object(builder,"loginWindow"));
     g_signal_connect(loginWindow,"destroy", G_CALLBACK(gtk_main_quit),NULL);

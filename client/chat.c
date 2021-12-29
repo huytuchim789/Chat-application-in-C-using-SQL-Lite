@@ -24,33 +24,33 @@ const char *HELP_STR = "\\l: list of active users, \\k ID REASON: kick (root onl
 void sleep_ms(int milliseconds)
 {
     struct timespec ts;
-    ts.tv_sec = milliseconds / 1000;
+    ts.tv_sec = milliseconds / 1000; //convert to seconds
     ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+    nanosleep(&ts, NULL); //suspend thread
 }
 
 void add_list_entry(const char *t, const char *a, const char *m, int sleep)
 {
-    GtkTreeIter iter;
-    gtk_list_store_append(GTK_LIST_STORE(messagesListStore), &iter);
-    gtk_list_store_set(GTK_LIST_STORE(messagesListStore), &iter, 0, t, 1, a, 2, m, -1);
+    GtkTreeIter iter; // pointer tree
+    gtk_list_store_append(GTK_LIST_STORE(messagesListStore), &iter); //point to a new node 
+    gtk_list_store_set(GTK_LIST_STORE(messagesListStore), &iter, 0, t, 1, a, 2, m, -1); //set value to new node
     if(sleep)
         sleep_ms(100);
-    gtk_adjustment_set_value(vAdjust, gtk_adjustment_get_upper(vAdjust) - gtk_adjustment_get_page_size(vAdjust));
+    gtk_adjustment_set_value(vAdjust, gtk_adjustment_get_upper(vAdjust) - gtk_adjustment_get_page_size(vAdjust)); //get scrolled
 }
 
 void do_send()
 {
-    if(!gtk_widget_get_sensitive(sendButton))
+    if(!gtk_widget_get_sensitive(sendButton))// when havent pressed buttton
         return;
-    gtk_label_set_text(GTK_LABEL(statusLabel), "");
+    gtk_label_set_text(GTK_LABEL(statusLabel), ""); //default value
     const gchar *message;
     message = gtk_entry_get_text(GTK_ENTRY(sendEntry));
     if(!message || !*message)
         return;
     if(message[0] == '\\' && message[1])
     {
-        if(message[1] == 'h' && (!message[2] || message[2] == ' '))
+        if(message[1] == 'h' && (!message[2] || message[2] == ' ')) //get help
         {
             gtk_label_set_text(GTK_LABEL(statusLabel), HELP_STR);
             gtk_entry_set_text(GTK_ENTRY(sendEntry), "");
@@ -67,10 +67,10 @@ void do_send()
             int uid;
             char num[16];
             int i = 3, j = 0;
-            while(message[i] == ' ')
+            while(message[i] == ' ') //pass \k
                 ++i;
-            while(j < 15 && message[i] != ' ' && message[i])
-                num[j++] = message[i++];
+            while(j < 15 && message[i] != ' ' && message[i])//pass \k ID
+                num[j++] = message[i++]; //get the id with max char is 16           
             if(j == 15)
             {
                 gtk_label_set_text(GTK_LABEL(statusLabel), "Usage: \\k ID REASON");
@@ -78,7 +78,8 @@ void do_send()
                 return;
             }
             num[j] = 0;
-            sscanf(num, "%d", &uid);
+            printf("%s",num);
+            sscanf(num, "%d", &uid); //conver num to int
             while(message[i] == ' ')
                 ++i;
             message_kick_user(uid, &message[i]);
@@ -138,10 +139,10 @@ void *watcher_thread(void *param)
 
 void init_chat_window(char *login)
 {
-    GtkBuilder *builder = gtk_builder_new_from_resource("/org/gtk/client/chat.glade");
+    GtkBuilder *builder = gtk_builder_new_from_file("./client/chat.glade");
 
     chatWindow = GTK_WIDGET(gtk_builder_get_object(builder,"chatWindow"));
-    char buf[100] = "AKOS chat client: ";
+    char buf[100] = "Group chat client: ";
     strcat(buf, login);
     gtk_window_set_title(GTK_WINDOW(chatWindow), buf);
     g_signal_connect(chatWindow,"destroy", G_CALLBACK(gtk_main_quit),NULL);
