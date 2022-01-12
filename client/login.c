@@ -22,9 +22,9 @@ struct login_info
 
 void *login_thread(void *param)
 {
-    char *res = message_connect(((struct login_info *)param)->ip, ((struct login_info *)param)->iport);
+    char *res = message_connect(((struct login_info *)param)->ip, ((struct login_info *)param)->iport); //connect to server
     if(!res)
-        res = message_do_login(((struct login_info *)param)->login, ((struct login_info *)param)->password);
+        res = message_do_login(((struct login_info *)param)->login, ((struct login_info *)param)->password); //if success dang nhap
     if(res)
     {
         gtk_label_set_text(GTK_LABEL(statusLabel), res);
@@ -112,7 +112,7 @@ void init_login_window()
     loginEntry = GTK_WIDGET(gtk_builder_get_object(builder,"loginEntry"));
     passwordEntry = GTK_WIDGET(gtk_builder_get_object(builder,"passwordEntry"));
     g_signal_connect(G_OBJECT(loginEntry),"activate", G_CALLBACK(do_login),NULL);
-    g_signal_connect(G_OBJECT(passwordEntry),"activate", G_CALLBACK(do_login),NULL);
+    g_signal_connect(G_OBJECT(passwordEntry),"activate", G_CALLBACK(do_login),NULL); //login
     ipEntry = GTK_WIDGET(gtk_builder_get_object(builder,"ipEntry"));
     portEntry = GTK_WIDGET(gtk_builder_get_object(builder,"portEntry"));
     g_signal_connect(G_OBJECT(ipEntry),"activate", G_CALLBACK(do_login),NULL);

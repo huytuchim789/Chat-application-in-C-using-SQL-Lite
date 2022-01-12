@@ -13,5 +13,6 @@ void message_send(char kind, struct timeval time, const char *login, const char 
 void message_history(char *login, struct proto_message *m, int sock);
 void message_list(char *login, int sock);
 void message_kick(char *login, struct proto_message *m, int sock);
+void message_private_chat(char *login, struct proto_message *m, int sock);
 
 #endif

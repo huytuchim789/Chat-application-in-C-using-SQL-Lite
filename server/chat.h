@@ -24,5 +24,6 @@ void chat_send_history(int cnt, int sock);
 int chat_get_user_list(struct chat_user_list **st);
 void chat_free_user_list(struct chat_user_list *s);
 int chat_kick_user(long long uid, const char *reason);
+int chat_private_user(char *cur_login,long long uid, const char *reason);
 void chat_clean();
 #endif

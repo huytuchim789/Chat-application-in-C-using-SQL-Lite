@@ -127,7 +127,7 @@ void *message_watcher(void *param)
     while(1)
     {
         pthread_testcancel();
-        sqlite3_sleep(100);
+        // sqlite3_sleep(100);
         pthread_testcancel();
         long long t = chat_last_message();
         if(t > cur)
@@ -166,7 +166,7 @@ void *connection_handler(void *param)
             puts("Broken message");
             break;
         }
-        switch(proto_get_type(msg))
+        switch(proto_get_type(msg)) //type từ client
         {
             case 'i':  // login
                 if(login)
@@ -212,6 +212,9 @@ void *connection_handler(void *param)
                 break;
             case 'k':
                 message_kick(login, msg, sock);
+                break;
+            case 'p':
+                message_private_chat(login, msg, sock);
                 break;
             default:
                 message_send_status(STATUS_UNKNOWN_TYPE, sock);
