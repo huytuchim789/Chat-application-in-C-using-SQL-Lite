@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkListStore" id="listRoom">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes"/>
+      </row>
+    </data>
+  </object>
+  <object class="GtkWindow" id="roomWindow">
+    <property name="width-request">700</property>
+    <property name="height-request">500</property>
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Chat room</property>
+    <property name="resizable">False</property>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <child>
+          <object class="GtkLabel" id="roomWelcome">
+            <property name="width-request">172</property>
+            <property name="height-request">80</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <attributes>
+              <attribute name="foreground" value="#c6c646460000"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">263</property>
+            <property name="y">10</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="pickButton">
+            <property name="label" translatable="yes">Pick!</property>
+            <property name="width-request">198</property>
+            <property name="height-request">80</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">254</property>
+            <property name="y">285</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBox" id="roomBox">
+            <property name="width-request">400</property>
+            <property name="height-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="model">listRoom</property>
+            <property name="has-entry">True</property>
+            <property name="entry-text-column">0</property>
+            <child internal-child="entry">
+              <object class="GtkEntry">
+                <property name="can-focus">False</property>
+                <property name="placeholder-text" translatable="yes">Choose your room</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">152</property>
+            <property name="y">138</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="registerEntry">
+            <property name="width-request">168</property>
+            <property name="height-request">47</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="primary-icon-stock">gtk-add</property>
+            <property name="placeholder-text" translatable="yes">Add your room</property>
+          </object>
+          <packing>
+            <property name="x">18</property>
+            <property name="y">432</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="status_label">
+            <property name="width-request">168</property>
+            <property name="height-request">40</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <attributes>
+              <attribute name="foreground" value="#e0e01b1b2424"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">18</property>
+            <property name="y">388</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

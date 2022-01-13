@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
-
 #include "login.h"
 
 int main(int argc,char *argv[]){

@@ -94,10 +94,12 @@ void message_do_logout()
     proto_recv_packet(message_buf, sock);
 }
 
-void message_send(const char *msg)
+void message_send(const char *msg, char *room)
 {
-    struct proto_message *p = proto_create('r', 1);
+    struct proto_message *p = proto_create('r', 2);
+    printf("SEND:%s", room);
     proto_set_str(p, 0, msg);
+    proto_set_str(p, 1, room);
     _send(p);
 }
 
@@ -181,7 +183,7 @@ int message_receive(struct timeval *time, char **author, char **body)
         char *s2 = proto_get_str(p, 2);
         *author = malloc(strlen(s1) + 1);
         strcpy(*author, s1);
-        *body =malloc(300);
+        *body = malloc(300);
         strcpy(*body, s2);
         char from[32];
         char content[128];
@@ -199,10 +201,11 @@ int message_receive(struct timeval *time, char **author, char **body)
     return tp;
 }
 
-void message_request_history(int cnt)
+void message_request_history(int cnt, char *room)
 {
-    struct proto_message *p = proto_create('h', 1);
+    struct proto_message *p = proto_create('h', 2);
     proto_set_int(p, 0, cnt);
+    proto_set_str(p, 1, room);
     _send(p);
 }
 
@@ -210,6 +213,35 @@ void message_request_list()
 {
     struct proto_message *p = proto_create('l', 0);
     _send(p);
+}
+char *message_add_room(const char *room_name)
+{
+    struct proto_message *p = proto_create('d', 1);
+    proto_set_str(p, 0, room_name);
+    _send(p);
+    unsigned len = proto_recv_packet(message_buf, sock);
+    if (len <= 0)
+    {
+        return "Connection failed";
+    }
+    p = proto_decode(message_buf, len);
+    if (!p || proto_get_type(p) != 's' || proto_get_line_count(p) < 1 || proto_get_len(p, 0) != 4)
+    {
+        return "Unknown error";
+    }
+    int t = proto_get_int(p, 0);
+    proto_free(p);
+    switch (t)
+    {
+    case STATUS_OK:
+        return "Added Successfully";
+    case STATUS_SIGNUP_ERROR:
+        return "Room Add error";
+    case STATUS_AUTH_ERROR:
+        return "Incorrect password";
+    default:
+        return "Unknown error";
+    }
 }
 
 void message_kick_user(int uid, const char *reason)
@@ -227,6 +259,50 @@ void message_private_user(int uid, const char *content)
     _send(p);
 }
 
+// room
+void message_room_list()
+{
+    struct proto_message *p = proto_create('j', 0);
+    _send(p);
+}
+int message_room_receive(char **name_list)
+{
+    int len = proto_recv_packet(message_buf, sock);
+    if (len <= 0)
+        return -1;
+    struct proto_message *p = proto_decode(message_buf, len);
+    if (!p)
+        return -1;
+    int tp = proto_get_type(p);
+    if (tp == 'j')
+    {
+        int cnt = proto_get_line_count(p) / 2;
+        int len = 20 + cnt * 50;
+        *name_list = malloc(len);
+        strcpy(*name_list, "");
+        for (int i = 0; i < cnt; ++i)
+        {
+            int uid = proto_get_int(p, i * 2);
+            char *name = proto_get_str(p, i * 2 + 1);
+            if (strlen(name) > 32)
+                continue;
+            sprintf(message_buf, "%s|", name);
+            strcat(*name_list, message_buf);
+        }
+    }
+    else
+    {
+        tp = 0;
+    }
+    proto_free(p);
+    return tp;
+}
+void message_joined_in(char *room)
+{
+    struct proto_message *p = proto_create('v', 1); // goi tin co type la i(login)
+    proto_set_str(p, 0, room);                      // user
+    _send(p);
+}
 void message_disconnect()
 {
     shutdown(sock, 2);

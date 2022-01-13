@@ -23,30 +23,6 @@ pthread_t watcher;
 #define REQUEST_HISTORY 10
 
 const char *HELP_STR = "\\l: list of active users, \\k ID REASON: kick (root only), \\p ID content:private chat by ID";
-// void view_onRowActivated(GtkTreeView *treeview,
-//                          GtkTreePath *path,
-//                          GtkTreeViewColumn *col,
-//                          gpointer userdata)
-// {
-//     GtkTreeModel *model;
-//     GtkTreeIter iter;
-
-//     g_print("A row has been double-clicked!\n");
-
-//     model = gtk_tree_view_get_model(treeview);
-
-//     if (gtk_tree_model_get_iter(model, &iter, path))
-//     {
-//         char *name;
-
-//         gtk_tree_model_get(model, &iter, "login", &name, -1);
-
-//         g_print("Double-clicked row contains name %s\n", name);
-
-//         g_free(name);
-//     }
-// }
-
 void sleep_ms(int milliseconds)
 {
     struct timespec ts;
@@ -80,7 +56,7 @@ void add_list_user_online(char *body)
     gtk_adjustment_set_value(vAdjust, gtk_adjustment_get_upper(vAdjust) - gtk_adjustment_get_page_size(vAdjust)); // get scrolled
 }
 
-void do_send()
+void do_send(GtkWidget *widget, gpointer *data)
 {
     if (!gtk_widget_get_sensitive(sendButton)) // when havent pressed buttton
         return;
@@ -167,18 +143,18 @@ void do_send()
     char *m = malloc(strlen(message) + 1);
     strcpy(m, message);
     gtk_entry_set_text(GTK_ENTRY(sendEntry), "");
-    message_send(m);
+    message_send(m, (char *)data);
     free(m);
 }
 
 void *watcher_thread(void *param)
 {
-    (void)param;
     struct timeval tv;
     struct tm *nowtm;
     char *author, *body;
     char timebuf[64];
-    message_request_history(REQUEST_HISTORY);
+    printf("His%s\n",(char *)param);
+    message_request_history(REQUEST_HISTORY,(char *)param);
     while (1)
     {
         int k = message_receive(&tv, &author, &body);
@@ -214,26 +190,27 @@ void *watcher_thread(void *param)
 
         free(author);
         free(body);
+        // free(param);
     }
     return param;
 }
 
-void init_chat_window(char *login)
+void init_chat_window(char *login, char *room)
 {
     GtkBuilder *builder = gtk_builder_new_from_file("./client/chat.glade");
 
     chatWindow = GTK_WIDGET(gtk_builder_get_object(builder, "chatWindow"));
     char buf[100] = "Group chat client: ";
     char wel[30];
-    strcat(buf, login);
+    strcat(buf, room);
     sprintf(wel, "Welcome %s!!", login);
     puts(wel);
     gtk_window_set_title(GTK_WINDOW(chatWindow), buf);
-    g_signal_connect(chatWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    // g_signal_connect(chatWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     sendEntry = GTK_WIDGET(gtk_builder_get_object(builder, "sendEntry"));
     sendButton = GTK_WIDGET(gtk_builder_get_object(builder, "sendButton"));
-    g_signal_connect(G_OBJECT(sendEntry), "activate", G_CALLBACK(do_send), NULL);
-    g_signal_connect(G_OBJECT(sendButton), "clicked", G_CALLBACK(do_send), NULL);
+    g_signal_connect(G_OBJECT(sendEntry), "activate", G_CALLBACK(do_send), (gpointer *)room);
+    g_signal_connect(G_OBJECT(sendButton), "clicked", G_CALLBACK(do_send), (gpointer *)room);
     statusLabel = GTK_WIDGET(gtk_builder_get_object(builder, "statusLabel"));
     welcome = GTK_WIDGET(gtk_builder_get_object(builder, "welcome"));
     gtk_label_set_text(GTK_LABEL(welcome), wel);
@@ -244,5 +221,5 @@ void init_chat_window(char *login)
     scrolledWindow = GTK_SCROLLED_WINDOW(gtk_builder_get_object(builder, "scrolledWindow"));
     // g_signal_connect(G_OBJECT(listUserTreeView), "row-activated", G_CALLBACK(view_onRowActivated),NULL);
     vAdjust = gtk_scrolled_window_get_vadjustment(scrolledWindow);
-    pthread_create(&watcher, 0, watcher_thread, 0);
+    pthread_create(&watcher, 0, watcher_thread, (void *)room);
 }

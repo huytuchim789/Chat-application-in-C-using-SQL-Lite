@@ -1,5 +1,6 @@
 #include "login.h"
 #include "chat.h"
+#include "room.h"
 #include "messages.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +33,8 @@ void *login_thread(void *param)
     }
     else
     {
-        init_chat_window(((struct login_info *)param)->login);
+        // init_chat_window(((struct login_info *)param)->login);
+        init_room_window(((struct login_info *)param)->login);
         logged_in = 1;
         free(param);
         return param;
@@ -94,7 +96,7 @@ gboolean check_login(void *param)
     if(logged_in)
     {
         gtk_widget_hide(loginWindow);
-        gtk_widget_show_all(chatWindow);
+        gtk_widget_show_all(roomWindow);
         logged_in = 0;
         return G_SOURCE_REMOVE;
     }

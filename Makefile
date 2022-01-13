@@ -1,5 +1,5 @@
 COMMON_FILES=../proto/proto.c
-CLIENT_FILES= login.c chat.c messages.c client_main.c $(COMMON_FILES)
+CLIENT_FILES= login.c chat.c messages.c room.c client_main.c $(COMMON_FILES)
 SERVER_FILES=messages.c chat.c server_main.c $(COMMON_FILES)
 GCC_FLAGS= -std=c99 -Wall -Wextra -pedantic -O2 -pthread -I../proto
 
