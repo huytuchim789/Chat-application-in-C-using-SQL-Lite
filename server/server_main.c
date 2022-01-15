@@ -68,7 +68,7 @@ void parse_opts(int argc, char **argv, int *port, char **root_password)
 int main(int argc, char **argv)
 {
     int desc;
-    int port = 1338;
+    int port = 1337;
     char *root_password = "12345";
     parse_opts(argc, argv, &port, &root_password);
     struct sockaddr_in addr;
@@ -118,7 +118,7 @@ struct thread_data
 {
     char *login;
     int sock;
-    char *room;
+    char room[32];
 };
 
 void *message_watcher(void *param)
@@ -152,7 +152,7 @@ void *connection_handler(void *param)
     free(param);
     char *buf = malloc(MESSAGE_BUF_SIZE);
     char *login = 0;
-    char *room = 0;
+    char room[32];
     pthread_t watcher = 0;
     signal(SIGPIPE, SIG_IGN);
     while (1)
@@ -184,7 +184,7 @@ void *connection_handler(void *param)
                     pthread_join(watcher, 0);
                     watcher = 0;
                 }
-                message_do_join_out(login, room);
+                message_log_out(login);
                 free(login);
             }
             login = message_login(msg, sock);
@@ -194,15 +194,16 @@ void *connection_handler(void *param)
             }
             break;
         case 'o': // joined out
-            if (watcher)
-            {
-                pthread_cancel(watcher);
-                pthread_join(watcher, 0);
-                watcher = 0;
-            }
+            // if (watcher)
+            // {
+            //     pthread_cancel(watcher);
+            //     pthread_join(watcher, 0);
+            //     watcher = 0;
+            // }
             message_join_out(login, sock, room);
-            free(room);
-            room = 0;
+            // free(room);
+            // room = 0;
+            memset(room, 0, strlen(room));
             break;
         case 'r':
             message_receive(login, msg, sock);
@@ -219,7 +220,7 @@ void *connection_handler(void *param)
             message_kick(login, msg, sock, room);
             break;
         case 'p':
-            message_private_chat(login, msg, sock);
+            message_private_chat(login, msg, sock,room);
             break;
         case 'd':
             message_room_add(login, msg, sock);
@@ -229,13 +230,15 @@ void *connection_handler(void *param)
             break;
         case 'v':
         {
-            room = message_joined_in(login, msg);
+            // room = message_joined_in(login, msg);
+            strcpy(room, message_joined_in(login, msg));
             struct thread_data data;
             data.login = login;
             data.sock = sock;
             puts(room);
-            if (room)
-                data.room = room;
+            if (strlen(room) > 0)
+                // data.room = room;
+                strcpy(data.room, room);
             puts(data.room);
             pthread_create(&watcher, 0, message_watcher, &data);
             break;
@@ -247,7 +250,7 @@ void *connection_handler(void *param)
         proto_free(msg);
     }
     printf("Room out :%s", room);
-    if (room)
+    if (login)
     {
         if (watcher)
         {
@@ -255,9 +258,9 @@ void *connection_handler(void *param)
             pthread_join(watcher, 0);
             watcher = 0;
         }
-        if (*room)
-            message_do_join_out(login, room);
-        free(room);
+        if (*login)
+            message_log_out(login);
+        free(login);
     }
     free(buf);
     return 0;

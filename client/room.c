@@ -30,7 +30,7 @@ void *room_thread(void *param)
     init_chat_window(((struct roomer_info *)param)->login, ((struct roomer_info *)param)->room);
     // gtk_widget_show(chatWindow);
     room_in = 1;
-    free(param);
+    // free(param);
     return param;
 }
 void add_list_room(char *body)
@@ -86,7 +86,7 @@ void do_register()
     const gchar *new_room;
     new_room = gtk_entry_get_text(GTK_ENTRY(registerEntry));
     char room[32];
-    strcpy(room,(char *)new_room);
+    strcpy(room, (char *)new_room);
     if (!new_room || !*new_room)
     {
         gtk_label_set_text(GTK_LABEL(status_label), "New Room must not be empty");
@@ -112,7 +112,6 @@ gboolean check_room(void *param)
         // gtk_widget_hide(roomWindow);
         gtk_widget_show(chatWindow);
         room_in = 0;
-        return G_SOURCE_REMOVE;
     }
     return G_SOURCE_CONTINUE;
 }

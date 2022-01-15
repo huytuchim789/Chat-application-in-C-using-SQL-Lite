@@ -106,12 +106,14 @@ void message_send(const char *msg, char *room)
 int message_receive(struct timeval *time, char **author, char **body)
 {
     int len = proto_recv_packet(message_buf, sock);
+    printf("Len Recei:%d\n\n",len);
     if (len <= 0)
         return -1;
     struct proto_message *p = proto_decode(message_buf, len);
     if (!p)
         return -1;
     int tp = proto_get_type(p);
+    printf("Message Receive:%d\n", tp);
     if (tp == 'r' || tp == 'h')
     {
         proto_get_timeval(p, 0, time);

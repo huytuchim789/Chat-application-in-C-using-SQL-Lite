@@ -38,6 +38,7 @@
     <property name="title" translatable="yes">AKOS chat client</property>
     <property name="resizable">False</property>
     <property name="window-position">center</property>
+    <property name="icon-name">applications-internet</property>
     <child>
       <object class="GtkFixed">
         <property name="visible">True</property>

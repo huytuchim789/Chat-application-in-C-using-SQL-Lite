@@ -162,6 +162,9 @@
             <property name="height-request">20</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <attributes>
+              <attribute name="foreground" value="#e0e01b1b2424"/>
+            </attributes>
           </object>
           <packing>
             <property name="x">6</property>

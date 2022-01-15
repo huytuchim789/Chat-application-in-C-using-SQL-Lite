@@ -153,16 +153,21 @@ void *watcher_thread(void *param)
     struct tm *nowtm;
     char *author, *body;
     char timebuf[64];
-    printf("His%s\n",(char *)param);
-    message_request_history(REQUEST_HISTORY,(char *)param);
+    printf("His%s\n", (char *)param);
+    message_request_history(REQUEST_HISTORY, (char *)param);
     while (1)
     {
         int k = message_receive(&tv, &author, &body);
-        printf("%c", k);
         if ((char)k == 'l')
         {
             add_list_user_online(body);
             continue;
+        }
+        if ((char)k == 'k')
+        {
+            gtk_label_set_text(GTK_LABEL(statusLabel), "You have been blocked and cant send a message");
+            gtk_widget_set_sensitive(sendButton, 0);
+            break;
         }
         if (k < 0)
         {
@@ -194,7 +199,10 @@ void *watcher_thread(void *param)
     }
     return param;
 }
-
+void out_room()
+{
+    message_do_logout();
+}
 void init_chat_window(char *login, char *room)
 {
     GtkBuilder *builder = gtk_builder_new_from_file("./client/chat.glade");
@@ -206,7 +214,7 @@ void init_chat_window(char *login, char *room)
     sprintf(wel, "Welcome %s!!", login);
     puts(wel);
     gtk_window_set_title(GTK_WINDOW(chatWindow), buf);
-    // g_signal_connect(chatWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(chatWindow, "destroy", G_CALLBACK(out_room), NULL);
     sendEntry = GTK_WIDGET(gtk_builder_get_object(builder, "sendEntry"));
     sendButton = GTK_WIDGET(gtk_builder_get_object(builder, "sendButton"));
     g_signal_connect(G_OBJECT(sendEntry), "activate", G_CALLBACK(do_send), (gpointer *)room);

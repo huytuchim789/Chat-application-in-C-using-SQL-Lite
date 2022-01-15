@@ -74,10 +74,10 @@ char *message_joined_in(char *login, struct proto_message *m)
 void message_do_join_out(char *login, char *room)
 {
     // chat_delete_session(login);
-    printf("%s logged out\n", login);
+    printf("%s joined out\n", login);
     char buf[64];
     strcpy(buf, login);
-    strcat(buf, " logged out");
+    strcat(buf, " joined out");
     chat_new_message("m", "", buf, room); // nortification message
 }
 
@@ -134,7 +134,7 @@ void message_send(char kind, struct timeval time, const char *login, const char 
         struct proto_message *p = proto_create('k', 1);
         proto_set_str(p, 0, body);
         _send(p, sock);
-        shutdown(sock, 2);
+        // shutdown(sock, 2);
     }
     if (kind == 'p')
     {
@@ -186,7 +186,9 @@ void message_list(char *login, int sock)
     _send(p, sock);
     printf("Sent user list to %s\n", login);
 }
-
+void message_log_out(char *login){
+    chat_delete_session(login);
+}
 void message_kick(char *login, struct proto_message *m, int sock, char *room)
 {
     if (proto_get_line_count(m) < 2 || proto_get_len(m, 0) != 4)
@@ -199,12 +201,12 @@ void message_kick(char *login, struct proto_message *m, int sock, char *room)
         message_send_status(STATUS_LOGIN_REQUIRED, sock);
         return;
     }
-    if (strcmp(login, "root"))
-    {
-        printf("%s tried to kick\n", login);
-        message_send_status(STATUS_ACCESS_DENIED, sock);
-        return;
-    }
+    // if (strcmp(login, "root"))
+    // {
+    //     printf("%s tried to kick\n", login);
+    //     message_send_status(STATUS_ACCESS_DENIED, sock);
+    //     return;
+    // }
     int uid = proto_get_int(m, 0);
     char *reason = proto_get_str(m, 1);
     if (chat_kick_user(uid, reason, room))
@@ -217,7 +219,7 @@ void message_kick(char *login, struct proto_message *m, int sock, char *room)
         printf("Tried to kick %d: %s\n", uid, reason);
     }
 }
-void message_private_chat(char *login, struct proto_message *m, int sock)
+void message_private_chat(char *login, struct proto_message *m, int sock,char *room)
 {
     if (proto_get_line_count(m) < 2 || proto_get_len(m, 0) != 4)
     {
@@ -237,9 +239,9 @@ void message_private_chat(char *login, struct proto_message *m, int sock)
     // }
     int uid = proto_get_int(m, 0);
     char *body = proto_get_str(m, 1);
-    if (chat_private_user(login, uid, body))
+    if (chat_private_user(login, uid, body,room))
     {
-        printf("Sent to user %d: %s\n", uid, body);
+        printf("Sent to user %d: %s in %s\n", uid, body,room);
         message_send_status(STATUS_OK, sock);
     }
     else

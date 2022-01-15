@@ -218,8 +218,8 @@ void chat_send_all(char *my_login, long long from, long long to, int sock, char 
                 continue;
             else
             {
-                my_login[0] = 0;
-                chat_delete_session(login);
+                // my_login[0] = 0;
+                // chat_delete_session(login);
             }
         }
         if (kind[0] == 'p')
@@ -322,7 +322,7 @@ int chat_kick_user(long long uid, const char *reason,char *room)
     chat_new_message("m", "", buf,room);
     return 1;
 }
-int chat_private_user(char *cur_login, long long uid, const char *content)
+int chat_private_user(char *cur_login, long long uid, const char *content,char *room)
 {
     DEBUG_LOCK
     pthread_mutex_lock(&msg_mutex);
@@ -343,7 +343,7 @@ int chat_private_user(char *cur_login, long long uid, const char *content)
     char new_content[128];
     sprintf(new_content, "%s|%s", cur_login, content);
     puts(new_content);
-    chat_new_message("p", login, new_content,"");
+    chat_new_message("p", login, new_content,room);
     char buf[512];
     strcpy(buf, login);
     strcat(buf, " received a message");

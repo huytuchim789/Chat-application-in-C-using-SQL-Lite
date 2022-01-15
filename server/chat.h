@@ -30,7 +30,7 @@ void chat_send_history(int cnt, int sock,char * room);
 int chat_get_user_list(struct chat_user_list **st);
 void chat_free_user_list(struct chat_user_list *s);
 int chat_kick_user(long long uid, const char *reason,char *room);
-int chat_private_user(char *cur_login, long long uid, const char *reason);
+int chat_private_user(char *cur_login, long long uid, const char *reason,char *room);
 
 //room
 int create_room(char *login, char *room_name);
