@@ -18,7 +18,14 @@ GtkAdjustment *vAdjust;
 GtkScrolledWindow *scrolledWindow;
 GtkListStore *messagesListStore;
 GtkListStore *userListStore;
+GtkWidget *inviteEntry;
+
+// dialog
+GtkWidget *dialog;
+GtkWidget *yesButton;
+GtkWidget *noButton;
 pthread_t watcher;
+int show_dialog;
 
 #define REQUEST_HISTORY 10
 
@@ -53,7 +60,7 @@ void add_list_user_online(char *body)
         gtk_list_store_set(GTK_LIST_STORE(userListStore), &iter, 0, token, -1); // set value to new node
         token = strtok(NULL, ",");
     }
-    gtk_adjustment_set_value(vAdjust, gtk_adjustment_get_upper(vAdjust) - gtk_adjustment_get_page_size(vAdjust)); // get scrolled
+    // gtk_adjustment_set_value(vAdjust, gtk_adjustment_get_upper(vAdjust) - gtk_adjustment_get_page_size(vAdjust)); // get scrolled
 }
 
 void do_send(GtkWidget *widget, gpointer *data)
@@ -146,7 +153,22 @@ void do_send(GtkWidget *widget, gpointer *data)
     message_send(m, (char *)data);
     free(m);
 }
-
+void do_invite()
+{
+    const gchar *invite_id;
+    invite_id = gtk_entry_get_text(GTK_ENTRY(inviteEntry));
+    if (!invite_id || !*invite_id)
+    {
+        gtk_label_set_text(GTK_LABEL(statusLabel), "ID cannot be empty");
+        return;
+    }
+    int uid = atoi(invite_id);
+    printf("ID invite:%d\n\n", uid);
+    char status[32];
+    strcpy(status, message_invite_user(uid));
+    gtk_entry_set_text(GTK_ENTRY(inviteEntry), "");
+    gtk_label_set_text(GTK_LABEL(statusLabel), status);
+}
 void *watcher_thread(void *param)
 {
     struct timeval tv;
@@ -167,7 +189,15 @@ void *watcher_thread(void *param)
         {
             gtk_label_set_text(GTK_LABEL(statusLabel), "You have been blocked and cant send a message");
             gtk_widget_set_sensitive(sendButton, 0);
+            gtk_entry_set_max_length(GTK_ENTRY(sendEntry), 0);
             break;
+        }
+        if ((char)k == 'w')
+        {
+            gtk_label_set_text(GTK_LABEL(statusLabel), "You received an invitation");
+            // gtk_widget_show(dialog);
+            show_dialog = 1;
+            continue;
         }
         if (k < 0)
         {
@@ -203,6 +233,37 @@ void out_room()
 {
     message_do_logout();
 }
+void yes()
+{
+    puts("yes");
+    gtk_widget_hide(dialog);
+}
+void no()
+{
+    puts("no");
+    // gtk_widget_hide(dialog);
+}
+gboolean check_dialog(void *param)
+{
+
+    // if (content)
+    // {
+    //     free(content);
+    // }
+    // if (hide_dialog)
+    // {
+    //     gtk_widget_show(dialog);
+    //     hide_dialog = 0;
+    // }
+    (void)param;
+    if (show_dialog)
+    {
+        // gtk_widget_hide(roomWindow);
+        gtk_widget_show(dialog);
+        show_dialog = 0;
+    }
+    return G_SOURCE_CONTINUE;
+}
 void init_chat_window(char *login, char *room)
 {
     GtkBuilder *builder = gtk_builder_new_from_file("./client/chat.glade");
@@ -216,8 +277,10 @@ void init_chat_window(char *login, char *room)
     gtk_window_set_title(GTK_WINDOW(chatWindow), buf);
     g_signal_connect(chatWindow, "destroy", G_CALLBACK(out_room), NULL);
     sendEntry = GTK_WIDGET(gtk_builder_get_object(builder, "sendEntry"));
+    inviteEntry = GTK_WIDGET(gtk_builder_get_object(builder, "inviteEntry"));
     sendButton = GTK_WIDGET(gtk_builder_get_object(builder, "sendButton"));
     g_signal_connect(G_OBJECT(sendEntry), "activate", G_CALLBACK(do_send), (gpointer *)room);
+    g_signal_connect(G_OBJECT(inviteEntry), "activate", G_CALLBACK(do_invite), (gpointer *)room);
     g_signal_connect(G_OBJECT(sendButton), "clicked", G_CALLBACK(do_send), (gpointer *)room);
     statusLabel = GTK_WIDGET(gtk_builder_get_object(builder, "statusLabel"));
     welcome = GTK_WIDGET(gtk_builder_get_object(builder, "welcome"));
@@ -228,6 +291,14 @@ void init_chat_window(char *login, char *room)
     userListStore = GTK_LIST_STORE(gtk_builder_get_object(builder, "userListStore"));
     scrolledWindow = GTK_SCROLLED_WINDOW(gtk_builder_get_object(builder, "scrolledWindow"));
     // g_signal_connect(G_OBJECT(listUserTreeView), "row-activated", G_CALLBACK(view_onRowActivated),NULL);
+
+    dialog = GTK_WIDGET(gtk_builder_get_object(builder, "dialog"));
+    yesButton = GTK_WIDGET(gtk_builder_get_object(builder, "yesButton"));
+    g_signal_connect(G_OBJECT(yesButton), "clicked", G_CALLBACK(yes), NULL);
+    noButton = GTK_WIDGET(gtk_builder_get_object(builder, "noButton"));
+    g_signal_connect(G_OBJECT(noButton), "clicked", G_CALLBACK(no), NULL);
     vAdjust = gtk_scrolled_window_get_vadjustment(scrolledWindow);
     pthread_create(&watcher, 0, watcher_thread, (void *)room);
+    check_dialog = 0;
+    g_timeout_add(50, check_dialog, 0);
 }

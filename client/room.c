@@ -14,8 +14,13 @@ GtkWidget *status_label;
 GtkWidget *registerEntry;
 GtkWidget *roomNameEntry;
 GtkListStore *listRoom;
+
+GtkWidget *dialog;
+GtkWidget *yesButton;
+GtkWidget *noButton;
 pthread_t roomer;
 int room_in;
+int hide_dialog;
 struct roomer_info
 {
     const char *room;
@@ -55,16 +60,33 @@ void *room_watcher_thread(void *param)
     (void)param;
     message_room_list();
     char *name_list;
-
+    char *content;
+    // while (1)
+    // {
     int k = message_room_receive(&name_list);
     if ((char)k == 'j')
     {
         add_list_room(name_list);
+        // free(name_list);
+    }
+    else if ((char)k == 'w')
+    {
+        printf("Invited:%c", k);
     }
     else
     {
-        puts("Error in init\n");
+        printf("Here:%d", k);
+        // break;
     }
+    // }
+
+    // while (1)
+    // {
+    //     int hide_dialog = message_receive_invite(content);
+    //     printf("Dialog:%d", hide_dialog);
+    //     if (hide_dialog <= 0)
+    //         break;
+    // }
     return param;
 }
 void do_pick(GtkWidget *widget, gpointer *data)
@@ -106,6 +128,16 @@ void do_register()
 }
 gboolean check_room(void *param)
 {
+
+    // if (content)
+    // {
+    //     free(content);
+    // }
+    // if (hide_dialog)
+    // {
+    //     gtk_widget_show(dialog);
+    //     hide_dialog = 0;
+    // }
     (void)param;
     if (room_in)
     {
@@ -115,6 +147,16 @@ gboolean check_room(void *param)
     }
     return G_SOURCE_CONTINUE;
 }
+// void yes()
+// {
+//     puts("yes");
+//     gtk_widget_hide(dialog);
+// }
+// void no()
+// {
+//     puts("no");
+//     // gtk_widget_hide(dialog);
+// }
 void init_room_window(char *login)
 {
     GtkBuilder *builder = gtk_builder_new_from_file("./client/room.glade");
@@ -134,8 +176,15 @@ void init_room_window(char *login)
     gtk_label_set_text(GTK_LABEL(roomWelcome), wel);
     listRoom = GTK_LIST_STORE(gtk_builder_get_object(builder, "listRoom"));
     roomNameEntry = GTK_WIDGET(gtk_builder_get_object(builder, "roomNameEntry"));
+
     // g_signal_connect(G_OBJECT(roomNameEntry), "changed", G_CALLBACK(onchange), NULL);
+    // dialog = GTK_WIDGET(gtk_builder_get_object(builder, "dialog"));
+    // yesButton = GTK_WIDGET(gtk_builder_get_object(builder, "yesButton"));
+    // g_signal_connect(G_OBJECT(yesButton), "clicked", G_CALLBACK(yes), NULL);
+    // noButton = GTK_WIDGET(gtk_builder_get_object(builder, "noButton"));
+    // g_signal_connect(G_OBJECT(noButton), "clicked", G_CALLBACK(no), NULL);
     pthread_create(&room_watcher, 0, room_watcher_thread, 0);
     room_in = 0;
+    hide_dialog = 0;
     g_timeout_add(50, check_room, 0);
 }

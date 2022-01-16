@@ -97,7 +97,6 @@ void message_do_logout()
 void message_send(const char *msg, char *room)
 {
     struct proto_message *p = proto_create('r', 2);
-    printf("SEND:%s", room);
     proto_set_str(p, 0, msg);
     proto_set_str(p, 1, room);
     _send(p);
@@ -106,7 +105,6 @@ void message_send(const char *msg, char *room)
 int message_receive(struct timeval *time, char **author, char **body)
 {
     int len = proto_recv_packet(message_buf, sock);
-    printf("Len Recei:%d\n\n",len);
     if (len <= 0)
         return -1;
     struct proto_message *p = proto_decode(message_buf, len);
@@ -180,6 +178,7 @@ int message_receive(struct timeval *time, char **author, char **body)
     }
     else if (tp == 'p')
     {
+        puts("Private");
         proto_get_timeval(p, 0, time);
         char *s1 = proto_get_str(p, 1);
         char *s2 = proto_get_str(p, 2);
@@ -192,8 +191,12 @@ int message_receive(struct timeval *time, char **author, char **body)
         sscanf(*body, "%[^|]|%s", from, content);
         sprintf(*body, "You received a message from %s (content: %s )", from, content);
         puts(*body);
-        // strcpy(*body, "You have been received (content: ");
-        // strncat(*body, content, 256);
+        strcpy(*body, "You have been received (content: ");
+        strncat(*body, content, 256);
+    }
+    else if (tp == 'w')
+    {
+       return tp;
     }
     else
     {
@@ -220,6 +223,35 @@ char *message_add_room(const char *room_name)
 {
     struct proto_message *p = proto_create('d', 1);
     proto_set_str(p, 0, room_name);
+    _send(p);
+    unsigned len = proto_recv_packet(message_buf, sock);
+    if (len <= 0)
+    {
+        return "Connection failed";
+    }
+    p = proto_decode(message_buf, len);
+    if (!p || proto_get_type(p) != 's' || proto_get_line_count(p) < 1 || proto_get_len(p, 0) != 4)
+    {
+        return "Unknown error";
+    }
+    int t = proto_get_int(p, 0);
+    proto_free(p);
+    switch (t)
+    {
+    case STATUS_OK:
+        return "Added Successfully";
+    case STATUS_SIGNUP_ERROR:
+        return "Room Add error";
+    case STATUS_AUTH_ERROR:
+        return "Incorrect password";
+    default:
+        return "Unknown error";
+    }
+}
+char *message_invite_user(int uid)
+{
+    struct proto_message *p = proto_create('w', 1);
+    proto_set_int(p, 0, uid);
     _send(p);
     unsigned len = proto_recv_packet(message_buf, sock);
     if (len <= 0)
@@ -292,12 +324,40 @@ int message_room_receive(char **name_list)
             strcat(*name_list, message_buf);
         }
     }
+    else if (tp == 'w')
+    {
+        *name_list = malloc(30);
+        char *body = proto_get_str(p, 2);
+        strcpy(*name_list, body);
+        return tp;
+    }
     else
     {
         tp = 0;
     }
     proto_free(p);
     return tp;
+}
+int message_receive_invite(char *content)
+{
+    int len = proto_recv_packet(message_buf, sock);
+    printf("Len Recei:%d\n\n", len);
+    if (len <= 0)
+        return -1;
+    struct proto_message *p = proto_decode(message_buf, len);
+    if (!p)
+        return -1;
+    int tp = proto_get_type(p);
+    content = malloc(32);
+    printf("Message Receive:%d\n", tp);
+    if (tp == 'w')
+    {
+        char *body = proto_get_str(p, 2);
+        strcpy(content, body);
+        return tp;
+    }
+    proto_free(p);
+    return 0;
 }
 void message_joined_in(char *room)
 {

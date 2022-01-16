@@ -131,6 +131,11 @@ void *message_watcher(void *param)
     long long cur = chat_last_message();
     while (1)
     {
+        if (strlen(cur_room) == 0)
+        {
+            printf("no room\n");
+            break;
+        }
         pthread_testcancel();
         // sqlite3_sleep(100);
         pthread_testcancel();
@@ -194,12 +199,6 @@ void *connection_handler(void *param)
             }
             break;
         case 'o': // joined out
-            // if (watcher)
-            // {
-            //     pthread_cancel(watcher);
-            //     pthread_join(watcher, 0);
-            //     watcher = 0;
-            // }
             message_join_out(login, sock, room);
             // free(room);
             // room = 0;
@@ -220,7 +219,7 @@ void *connection_handler(void *param)
             message_kick(login, msg, sock, room);
             break;
         case 'p':
-            message_private_chat(login, msg, sock,room);
+            message_private_chat(login, msg, sock, room);
             break;
         case 'd':
             message_room_add(login, msg, sock);
@@ -235,15 +234,16 @@ void *connection_handler(void *param)
             struct thread_data data;
             data.login = login;
             data.sock = sock;
-            puts(room);
+            printf("You joined as %s", room);
             if (strlen(room) > 0)
                 // data.room = room;
                 strcpy(data.room, room);
-            puts(data.room);
             pthread_create(&watcher, 0, message_watcher, &data);
             break;
         }
-
+        case 'w':
+            message_invite_user(login, msg, sock, room);
+            break;
         default:
             message_send_status(STATUS_UNKNOWN_TYPE, sock);
         }

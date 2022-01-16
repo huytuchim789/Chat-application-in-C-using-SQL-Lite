@@ -212,7 +212,7 @@ void chat_send_all(char *my_login, long long from, long long to, int sock, char 
         struct timeval tv;
         tv.tv_usec = t << 32 >> 32;
         tv.tv_sec = t >> 32;
-        if (kind[0] == 'k')
+        if (kind[0] == 'k' || kind[0] == 'w')
         {
             if (strcmp(login, my_login))
                 continue;
@@ -250,7 +250,7 @@ void chat_send_history(int cnt, int sock, char *room)
         struct timeval tv;
         tv.tv_usec = t << 32 >> 32;
         tv.tv_sec = t >> 32;
-        printf("%s %s %s\n",login,body,room);
+        printf("%s %s %s\n", login, body, room);
         message_send('h', tv, login, body, sock);
     }
     sqlite3_finalize(stmt);
@@ -290,7 +290,7 @@ void chat_free_user_list(struct chat_user_list *s)
     }
 }
 
-int chat_kick_user(long long uid, const char *reason,char *room)
+int chat_kick_user(long long uid, const char *reason, char *room)
 {
     DEBUG_LOCK
     pthread_mutex_lock(&msg_mutex);
@@ -308,7 +308,7 @@ int chat_kick_user(long long uid, const char *reason,char *room)
     const char *login = (const char *)sqlite3_column_text(stmt, 0);
     pthread_mutex_unlock(&msg_mutex);
     DEBUG_UNLOCK
-    chat_new_message("k", login, reason,room);
+    chat_new_message("k", login, reason, room);
     char buf[512];
     strcpy(buf, login);
     strcat(buf, " kicked");
@@ -319,10 +319,10 @@ int chat_kick_user(long long uid, const char *reason,char *room)
         strcat(buf, ")");
     }
     sqlite3_finalize(stmt);
-    chat_new_message("m", "", buf,room);
+    chat_new_message("m", "", buf, room);
     return 1;
 }
-int chat_private_user(char *cur_login, long long uid, const char *content,char *room)
+int chat_private_user(char *cur_login, long long uid, const char *content, char *room)
 {
     DEBUG_LOCK
     pthread_mutex_lock(&msg_mutex);
@@ -343,7 +343,7 @@ int chat_private_user(char *cur_login, long long uid, const char *content,char *
     char new_content[128];
     sprintf(new_content, "%s|%s", cur_login, content);
     puts(new_content);
-    chat_new_message("p", login, new_content,room);
+    chat_new_message("p", login, new_content, room);
     char buf[512];
     strcpy(buf, login);
     strcat(buf, " received a message");
@@ -353,6 +353,36 @@ int chat_private_user(char *cur_login, long long uid, const char *content,char *
         strncat(buf, content, 256);
         strcat(buf, ")");
     }
+    puts(buf);
+    sqlite3_finalize(stmt);
+    // chat_new_message("m", "", buf);
+    return 1;
+}
+int chat_invite_user(char *cur_login, long long uid, char *room)
+{
+    DEBUG_LOCK
+    pthread_mutex_lock(&msg_mutex);
+    sqlite3_stmt *stmt, *stmt1;
+    sqlite3_prepare_v2(db, "SELECT login FROM users WHERE ROWID=? AND login IN (SELECT login FROM sessions)", -1, &stmt, 0);
+    sqlite3_bind_int64(stmt, 1, uid);
+    int rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        pthread_mutex_unlock(&msg_mutex);
+        DEBUG_UNLOCK
+        return 0;
+    }
+    const char *login = (const char *)sqlite3_column_text(stmt, 0);
+    pthread_mutex_unlock(&msg_mutex);
+    DEBUG_UNLOCK
+    char new_content[128];
+    sprintf(new_content, "%s", cur_login);
+    puts(new_content);
+    chat_new_message("w", login, new_content, room);
+    char buf[512];
+    strcpy(buf, login);
+    strcat(buf, "received an invitation");
     puts(buf);
     sqlite3_finalize(stmt);
     // chat_new_message("m", "", buf);

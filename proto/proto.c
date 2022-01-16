@@ -20,7 +20,6 @@ static int recv_bytes(char *buf, int sock, int len)
     while (len)
     {
         int t = recv(sock, buf, len, 0);
-        puts(buf);
         if (t <= 0)
             return t;
         len -= t;
