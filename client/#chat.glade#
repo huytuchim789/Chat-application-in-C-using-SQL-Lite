@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkDialog" id="dialog">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">asd</property>
+    <property name="type-hint">dialog</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="yesButton">
+                <property name="label" translatable="yes">Yes</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="noButton">
+                <property name="label" translatable="yes">No</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkListStore" id="messagesListStore">
+    <columns>
+      <!-- column-name time -->
+      <column type="gchararray"/>
+      <!-- column-name author -->
+      <column type="gchararray"/>
+      <!-- column-name message -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="userListStore">
+    <columns>
+      <!-- column-name login -->
+      <column type="gchararray"/>
+      <!-- column-name id -->
+      <column type="gint"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes"/>
+        <col id="1">0</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkWindow" id="chatWindow">
+    <property name="width-request">660</property>
+    <property name="height-request">510</property>
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">AKOS chat client</property>
+    <property name="resizable">False</property>
+    <property name="window-position">center</property>
+    <property name="icon-name">applications-internet</property>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="margin-right">10</property>
+        <child>
+          <object class="GtkEntry" id="sendEntry">
+            <property name="width-request">556</property>
+            <property name="height-request">34</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="has-focus">True</property>
+            <property name="max-length">65535</property>
+            <property name="show-emoji-icon">True</property>
+            <property name="enable-emoji-completion">True</property>
+          </object>
+          <packing>
+            <property name="x">6</property>
+            <property name="y">464</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="sendButton">
+            <property name="label" translatable="yes">Send</property>
+            <property name="width-request">76</property>
+            <property name="height-request">34</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">574</property>
+            <property name="y">465</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledWindow">
+            <property name="width-request">644</property>
+            <property name="height-request">440</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="vadjustment">adjustment1</property>
+            <property name="hscrollbar-policy">never</property>
+            <property name="shadow-type">in</property>
+            <child>
+              <object class="GtkTreeView" id="messagesTreeView">
+                <property name="width-request">642</property>
+                <property name="height-request">439</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="vscroll-policy">natural</property>
+                <property name="model">messagesListStore</property>
+                <property name="headers-visible">False</property>
+                <property name="enable-search">False</property>
+                <property name="show-expanders">False</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection">
+                    <property name="mode">none</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="timeColumn">
+                    <property name="title">ID</property>
+                    <property name="clickable">True</property>
+                    <property name="sort-indicator">True</property>
+                    <property name="sort-column-id">0</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="timeCellRendererText">
+                        <property name="foreground-gdk">#bababdbdb6b6</property>
+                      </object>
+                      <attributes>
+                        <attribute name="font">2</attribute>
+                        <attribute name="text">0</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="authorColumn">
+                    <property name="title">ID</property>
+                    <property name="clickable">True</property>
+                    <property name="sort-indicator">True</property>
+                    <property name="sort-column-id">0</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="authorCellRendererText">
+                        <property name="underline">single</property>
+                      </object>
+                      <attributes>
+                        <attribute name="background">2</attribute>
+                        <attribute name="background-gdk">1</attribute>
+                        <attribute name="text">1</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="messageColumn">
+                    <property name="title">ID</property>
+                    <property name="clickable">True</property>
+                    <property name="sort-indicator">True</property>
+                    <property name="sort-column-id">0</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="messageCellRendererText">
+                        <property name="wrap-mode">word-char</property>
+                        <property name="wrap-width">440</property>
+                      </object>
+                      <attributes>
+                        <attribute name="text">2</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">7</property>
+            <property name="y">20</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="statusLabel">
+            <property name="width-request">28</property>
+            <property name="height-request">20</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <attributes>
+              <attribute name="foreground" value="#e0e01b1b2424"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">6</property>
+            <property name="y">498</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width-request">28</property>
+            <property name="height-request">20</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Type \h for help with chat commands</property>
+          </object>
+          <packing>
+            <property name="x">8</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTreeView" id="listUserTreeView">
+            <property name="width-request">128</property>
+            <property name="height-request">440</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="model">userListStore</property>
+            <property name="headers-visible">False</property>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection">
+                <property name="mode">none</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn" id="userName">
+                <property name="title">ID</property>
+                <property name="clickable">True</property>
+                <property name="sort-indicator">True</property>
+                <property name="sort-column-id">0</property>
+                <child>
+                  <object class="GtkCellRendererText" id="timeCellRendererText1">
+                    <property name="foreground-gdk">#2626a2a26969</property>
+                  </object>
+                  <attributes>
+                    <attribute name="size">3</attribute>
+                    <attribute name="text">0</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">662</property>
+            <property name="y">20</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="welcome">
+            <property name="width-request">148</property>
+            <property name="height-request">21</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="justify">right</property>
+            <property name="ellipsize">end</property>
+            <attributes>
+              <attribute name="style" value="italic"/>
+              <attribute name="weight" value="bold"/>
+              <attribute name="foreground" value="#c6c646460000"/>
+              <attribute name="background" value="#000000000000"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">614</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="inviteEntry">
+            <property name="name">inviteButton</property>
+            <property name="width-request">128</property>
+            <property name="height-request">34</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="width-chars">0</property>
+            <property name="primary-icon-stock">gtk-add</property>
+            <property name="placeholder-text" translatable="yes">Invite By ID</property>
+          </object>
+          <packing>
+            <property name="x">662</property>
+            <property name="y">464</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

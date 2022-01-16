@@ -196,7 +196,13 @@ void *watcher_thread(void *param)
         {
             gtk_label_set_text(GTK_LABEL(statusLabel), "You received an invitation");
             // gtk_widget_show(dialog);
+            char from[32];
+            char room[128];
+            sscanf(body, "%[^|]|%[^\n]", from, room);
+            char content[200];
+            sprintf(content, "%s invite you to join %s", from, room);
             show_dialog = 1;
+            gtk_window_set_title(GTK_WINDOW(dialog), content);
             continue;
         }
         if (k < 0)
@@ -234,14 +240,14 @@ void out_room()
     message_do_logout();
 }
 void yes()
-{
-    puts("yes");
+{   gtk_label_set_text(GTK_LABEL(statusLabel),"You accepted an invitation");
     gtk_widget_hide(dialog);
 }
 void no()
 {
     puts("no");
-    // gtk_widget_hide(dialog);
+    gtk_label_set_text(GTK_LABEL(statusLabel),"You denied an invitation");
+    gtk_widget_hide(dialog);
 }
 gboolean check_dialog(void *param)
 {
@@ -299,6 +305,6 @@ void init_chat_window(char *login, char *room)
     g_signal_connect(G_OBJECT(noButton), "clicked", G_CALLBACK(no), NULL);
     vAdjust = gtk_scrolled_window_get_vadjustment(scrolledWindow);
     pthread_create(&watcher, 0, watcher_thread, (void *)room);
-    check_dialog = 0;
+    show_dialog = 0;
     g_timeout_add(50, check_dialog, 0);
 }

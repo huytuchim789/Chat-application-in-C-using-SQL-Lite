@@ -209,10 +209,11 @@ void chat_send_all(char *my_login, long long from, long long to, int sock, char 
         long long t = sqlite3_column_int64(stmt, 1);
         const char *login = (const char *)sqlite3_column_text(stmt, 2);
         const char *body = (const char *)sqlite3_column_text(stmt, 3);
+        const char *room = (const char *)sqlite3_column_text(stmt, 4);
         struct timeval tv;
         tv.tv_usec = t << 32 >> 32;
         tv.tv_sec = t >> 32;
-        if (kind[0] == 'k' || kind[0] == 'w')
+        if (kind[0] == 'k')
         {
             if (strcmp(login, my_login))
                 continue;
@@ -220,6 +221,19 @@ void chat_send_all(char *my_login, long long from, long long to, int sock, char 
             {
                 // my_login[0] = 0;
                 // chat_delete_session(login);
+            }
+        }
+        if (kind[0] == 'w')
+        {
+            if (strcmp(login, my_login))
+                continue;
+            else
+            {
+                char body_room[256];
+                sprintf(body_room, "%s|%s", body, room);
+                puts(body_room);
+                message_send(kind[0], tv, login, body_room, sock);
+                continue;
             }
         }
         if (kind[0] == 'p')

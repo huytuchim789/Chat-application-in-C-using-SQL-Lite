@@ -190,13 +190,22 @@ int message_receive(struct timeval *time, char **author, char **body)
         char content[128];
         sscanf(*body, "%[^|]|%s", from, content);
         sprintf(*body, "You received a message from %s (content: %s )", from, content);
-        puts(*body);
-        strcpy(*body, "You have been received (content: ");
+        strcpy(*body, "You have been received content: ");
         strncat(*body, content, 256);
     }
     else if (tp == 'w')
     {
-       return tp;
+        char *s2 = proto_get_str(p, 2);
+        *body = malloc(300);
+        strcpy(*body, s2);
+        puts(*body);
+        // char from[32];
+        // char content[128];
+        // sscanf(*body, "%[^|]|%s", from, content);
+        // sprintf(*body, "You received a message from %s (content: %s )", from, content);
+        // strcpy(*body, "You have been received content: ");
+        // strncat(*body, content, 256);
+        return tp;
     }
     else
     {
