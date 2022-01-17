@@ -199,9 +199,7 @@ int message_receive(struct timeval *time, char **author, char **body)
         *body = malloc(300);
         strcpy(*body, s2);
         puts(*body);
-        // char from[32];
-        // char content[128];
-        // sscanf(*body, "%[^|]|%s", from, content);
+        
         // sprintf(*body, "You received a message from %s (content: %s )", from, content);
         // strcpy(*body, "You have been received content: ");
         // strncat(*body, content, 256);

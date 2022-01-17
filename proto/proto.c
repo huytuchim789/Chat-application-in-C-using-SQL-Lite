@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include "proto.h"
-
+#include "aes.h"
+char *IV = "AAAAAAAAAAAAAAAA";
+char *key = "0123456789abcdef";
+int keysize = 16;
 static unsigned read_num(char *buf)
 {
     unsigned a = *(unsigned *)buf;
@@ -12,7 +15,7 @@ static unsigned read_num(char *buf)
 
 static void write_num(unsigned a, char *buf)
 {
-    *(unsigned *)buf =a;
+    *(unsigned *)buf = a;
 }
 
 static int recv_bytes(char *buf, int sock, int len)
@@ -62,9 +65,12 @@ void proto_free(struct proto_message *s)
 
 struct proto_message *proto_decode(char *buf, size_t length)
 {
+
     struct proto_message *res;
     if (length < 5)
         return 0;
+    decrypt(buf, 500, IV, key, keysize);
+    printf("Decrypted:%s,length:%ld\n",buf,length);
     char *end = buf + length;
     res = malloc(sizeof(struct proto_message));
     res->type = buf[0];
@@ -126,6 +132,8 @@ unsigned proto_encode(struct proto_message *msg, char **buf)
         }
         data += msg->lines[i].length;
     }
+    encrypt(data, 500, IV, key, keysize);
+    printf("Encrypted:%s\n", data);
     return length;
 }
 
