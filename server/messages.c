@@ -315,6 +315,23 @@ void message_room_add(char *login, struct proto_message *m, int sock)
         printf("\nAdd Error\n");
     }
 }
+void message_room_leader(char *login, struct proto_message *m, int sock)
+{
+    if (!login)
+    {
+        message_send_status(STATUS_LOGIN_REQUIRED, sock);
+        return;
+    }
+    char *room_name = proto_get_str(m, 0);
+    char *creator = room_get_leader(login, room_name);
+    if (creator)
+    {
+        struct proto_message *p = proto_create('x', 1);
+        printf("creator:%s %ld\n", creator, strlen(creator));
+        proto_set_str(p, 0, creator);
+        _send(p, sock);
+    }
+}
 void message_room_list(char *login, int sock)
 {
     if (!login)

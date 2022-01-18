@@ -147,6 +147,26 @@ int create_room(char *login, char *room_name)
     return 1;
     DEBUG_UNLOCK
 }
+char *room_get_leader(char *login, char *room_name)
+{
+    sqlite3_stmt *stmt;
+    DEBUG_LOCK
+    pthread_mutex_lock(&msg_mutex);
+    sqlite3_prepare_v2(db, "SELECT creator from rooms where name=?", -1, &stmt, 0);
+    sqlite3_bind_text(stmt, 1, room_name, strlen(room_name), SQLITE_STATIC);
+    int rc;
+    char *creator = NULL;
+    if ((rc = sqlite3_step(stmt)) != SQLITE_DONE)
+    {
+        creator = (char *)sqlite3_column_text(stmt, 0);
+    }
+    char *t = malloc(strlen(creator) + 1);
+    strcpy(t, creator);
+    sqlite3_finalize(stmt);
+    pthread_mutex_unlock(&msg_mutex);
+    DEBUG_UNLOCK
+    return t;
+}
 void chat_delete_session(const char *login)
 {
     sqlite3_stmt *stmt;

@@ -16,6 +16,7 @@ void message_kick(char *login, struct proto_message *m, int sock,char *room);
 void message_private_chat(char *login, struct proto_message *m, int sock,char *room);
 void message_invite_user(char *login, struct proto_message *m, int sock,char *room);
 void message_room_add(char *login, struct proto_message *m, int sock);
+void message_room_leader(char *login, struct proto_message *m, int sock);
 void message_room_list(char *login, int sock);
 char *message_joined_in(char *login,struct proto_message *m);
 #endif

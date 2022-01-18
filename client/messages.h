@@ -13,5 +13,6 @@ int message_receive_invite(char *content);
 void message_disconnect();
 char *message_add_room(const char *room_name);
 int message_room_receive(char **name);
+char *message_room_leader(const char *room_name);
 void message_room_list();
 void message_joined_in();

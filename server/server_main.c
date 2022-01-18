@@ -244,6 +244,9 @@ void *connection_handler(void *param)
         case 'w':
             message_invite_user(login, msg, sock, room);
             break;
+        case 'x':
+            message_room_leader(login, msg, sock);
+            break;
         default:
             message_send_status(STATUS_UNKNOWN_TYPE, sock);
         }

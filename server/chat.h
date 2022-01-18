@@ -34,6 +34,7 @@ int chat_private_user(char *cur_login, long long uid, const char *reason, char *
 int chat_invite_user(char *cur_login, long long uid, char *room);
 // room
 int create_room(char *login, char *room_name);
+char *room_get_leader(char *login, char *room_name);
 int chat_get_room_list(struct room_list **st);
 void chat_free_room_list(struct room_list *s);
 void chat_clean();

@@ -166,10 +166,10 @@ void init_room_window(char *login)
     strcpy(buf, login);
     sprintf(wel, "Welcome %s!!", login);
     g_signal_connect(roomWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    pickButton = GTK_WIDGET(gtk_builder_get_object(builder, "pickButton"));
+    pickButton = GTK_WIDGET(gtk_builder_get_object(builder, "pickButton"));//pick
     g_signal_connect(G_OBJECT(pickButton), "clicked", G_CALLBACK(do_pick), (gpointer *)login);
     registerEntry = GTK_WIDGET(gtk_builder_get_object(builder, "registerEntry"));
-    g_signal_connect(G_OBJECT(registerEntry), "activate", G_CALLBACK(do_register), NULL);
+    g_signal_connect(G_OBJECT(registerEntry), "activate", G_CALLBACK(do_register), NULL); //tạo phòng
     roomBox = GTK_WIDGET(gtk_builder_get_object(builder, "roomBox"));
     roomWelcome = GTK_WIDGET(gtk_builder_get_object(builder, "roomWelcome"));
     status_label = GTK_WIDGET(gtk_builder_get_object(builder, "status_label"));
@@ -183,7 +183,7 @@ void init_room_window(char *login)
     // g_signal_connect(G_OBJECT(yesButton), "clicked", G_CALLBACK(yes), NULL);
     // noButton = GTK_WIDGET(gtk_builder_get_object(builder, "noButton"));
     // g_signal_connect(G_OBJECT(noButton), "clicked", G_CALLBACK(no), NULL);
-    pthread_create(&room_watcher, 0, room_watcher_thread, 0);
+    pthread_create(&room_watcher, 0, room_watcher_thread, 0); //tạo 1 luồng mới
     room_in = 0;
     hide_dialog = 0;
     g_timeout_add(50, check_room, 0);

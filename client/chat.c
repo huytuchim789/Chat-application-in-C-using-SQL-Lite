@@ -14,6 +14,7 @@ GtkWidget *statusLabel;
 GtkWidget *welcome;
 GtkWidget *messagesTreeView;
 GtkWidget *listUserTreeView;
+GtkWidget *roomLeader;
 GtkAdjustment *vAdjust;
 GtkScrolledWindow *scrolledWindow;
 GtkListStore *messagesListStore;
@@ -176,6 +177,10 @@ void *watcher_thread(void *param)
     char *author, *body;
     char timebuf[64];
     printf("His%s\n", (char *)param);
+    char *creator = message_room_leader((char *)param);
+    char creatorLabel[256];
+    sprintf(creatorLabel,"Room Creator: %s",creator);
+    gtk_label_set_text(GTK_LABEL(roomLeader), creatorLabel);
     message_request_history(REQUEST_HISTORY, (char *)param);
     while (1)
     {
@@ -189,7 +194,10 @@ void *watcher_thread(void *param)
         {
             gtk_label_set_text(GTK_LABEL(statusLabel), "You have been blocked and cant send a message");
             gtk_widget_set_sensitive(sendButton, 0);
-            gtk_entry_set_max_length(GTK_ENTRY(sendEntry), 0);
+            gtk_editable_set_editable(GTK_EDITABLE(sendEntry), FALSE);
+            gtk_widget_set_can_focus(GTK_WIDGET(sendEntry), FALSE);
+            gtk_editable_set_editable(GTK_EDITABLE(inviteEntry), FALSE);
+            gtk_widget_set_can_focus(GTK_WIDGET(inviteEntry), FALSE);
             break;
         }
         if ((char)k == 'w')
@@ -240,13 +248,14 @@ void out_room()
     message_do_logout();
 }
 void yes()
-{   gtk_label_set_text(GTK_LABEL(statusLabel),"You accepted an invitation");
+{
+    gtk_label_set_text(GTK_LABEL(statusLabel), "You accepted an invitation");
     gtk_widget_hide(dialog);
 }
 void no()
 {
     puts("no");
-    gtk_label_set_text(GTK_LABEL(statusLabel),"You denied an invitation");
+    gtk_label_set_text(GTK_LABEL(statusLabel), "You denied an invitation");
     gtk_widget_hide(dialog);
 }
 gboolean check_dialog(void *param)
@@ -289,6 +298,7 @@ void init_chat_window(char *login, char *room)
     g_signal_connect(G_OBJECT(inviteEntry), "activate", G_CALLBACK(do_invite), (gpointer *)room);
     g_signal_connect(G_OBJECT(sendButton), "clicked", G_CALLBACK(do_send), (gpointer *)room);
     statusLabel = GTK_WIDGET(gtk_builder_get_object(builder, "statusLabel"));
+    roomLeader = GTK_WIDGET(gtk_builder_get_object(builder, "roomLeader"));
     welcome = GTK_WIDGET(gtk_builder_get_object(builder, "welcome"));
     gtk_label_set_text(GTK_LABEL(welcome), wel);
     messagesTreeView = GTK_WIDGET(gtk_builder_get_object(builder, "messagesTreeView"));

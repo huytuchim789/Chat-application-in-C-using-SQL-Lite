@@ -190,8 +190,8 @@ int message_receive(struct timeval *time, char **author, char **body)
         char content[128];
         sscanf(*body, "%[^|]|%s", from, content);
         sprintf(*body, "You received a message from %s (content: %s )", from, content);
-        strcpy(*body, "You have been received content: ");
-        strncat(*body, content, 256);
+        // strcpy(*body, "You have been received content: ");
+        // strncat(*body, content, 256);
     }
     else if (tp == 'w')
     {
@@ -199,7 +199,7 @@ int message_receive(struct timeval *time, char **author, char **body)
         *body = malloc(300);
         strcpy(*body, s2);
         puts(*body);
-        
+
         // sprintf(*body, "You received a message from %s (content: %s )", from, content);
         // strcpy(*body, "You have been received content: ");
         // strncat(*body, content, 256);
@@ -254,6 +254,28 @@ char *message_add_room(const char *room_name)
     default:
         return "Unknown error";
     }
+}
+char *message_room_leader(const char *room_name)
+{
+    struct proto_message *p = proto_create('x', 1);
+    proto_set_str(p, 0, room_name);
+    _send(p);
+    unsigned len = proto_recv_packet(message_buf, sock);
+    if (len <= 0)
+    {
+        return "Connection failed";
+    }
+    p = proto_decode(message_buf, len);
+    // if (!p || proto_get_line_count(p) < 1)
+    // {
+    //     return "Unknown error";
+    // }
+    char *creator = proto_get_str(p, 0);
+    puts(creator);
+    // *leader=malloc(300);
+    // strcpy(*leader,creator);
+    return creator;
+    proto_free(p);
 }
 char *message_invite_user(int uid)
 {

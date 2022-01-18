@@ -13,7 +13,7 @@ GtkWidget *loginWindow;
 pthread_t loginner;
 int logged_in;
 
-struct login_info
+struct login_info //khuôn
 {
     const char *ip;
     const char *login;
@@ -34,7 +34,7 @@ void *login_thread(void *param)
     else
     {
         // init_chat_window(((struct login_info *)param)->login);
-        init_room_window(((struct login_info *)param)->login);
+        init_room_window(((struct login_info *)param)->login); //khoi dong màn hình room
         logged_in = 1;
         free(param);
         return param;
