@@ -19,4 +19,18 @@ void message_room_add(char *login, struct proto_message *m, int sock);
 void message_room_leader(char *login, struct proto_message *m, int sock);
 void message_room_list(char *login, int sock);
 char *message_joined_in(char *login,struct proto_message *m);
+
+#define LOGIN_ACTION 'i'
+#define ROOM_ADD_ACTION 'd'
+#define ROOM_LIST_ACTION 'j'
+#define ROOM_JOIN_ACTION 'v'
+#define ROOM_LEADER_GET_ACTION 'x'
+#define MESSAGE_HISTORY_GET_ACTION 'h'
+#define MESSAGE_LIST_GET_ACTION 'l'
+#define MESSAGE_REICEVE_ACTION 'r'
+#define MESSAGE_KICK_ACTION 'k'
+#define MESSAGE_PRIVATE_ACTION 'p'
+#define MESSAGE_ROOM_OUT_ACTION 'o'
+#define MESSAGE_INVITE_ACTION 'w'
+
 #endif

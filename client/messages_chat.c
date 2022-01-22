@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include "proto.h"
-#include "messages.h"
+#include "messages_chat.h"
 int sock;
 char message_buf[MESSAGE_BUF_SIZE];
 

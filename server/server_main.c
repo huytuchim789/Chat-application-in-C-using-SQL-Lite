@@ -239,7 +239,7 @@ void *connection_handler(void *param)
         }
         switch (proto_get_type(msg)) // type từ client
         {
-        case 'i': // login
+        case LOGIN_ACTION: // login
             // if (login)
             // {
             //     if (watcher)
@@ -258,13 +258,13 @@ void *connection_handler(void *param)
             }
             break;
 
-        case 'd':
+        case ROOM_ADD_ACTION:
             message_room_add(login, msg, sock);
             break;
-        case 'j':
+        case ROOM_LIST_ACTION:
             message_room_list(login, sock);
             break;
-        case 'v':
+        case ROOM_JOIN_ACTION:
         {
             // room = message_joined_in(login, msg);
             socklen_t c = sizeof(struct sockaddr_in);
@@ -328,34 +328,34 @@ void *connection_handler(void *param)
                     }
                     switch (proto_get_type(msg_child)) // type từ client
                     {
-                    case 'x':
+                    case ROOM_LEADER_GET_ACTION:
                         message_room_leader(login, msg_child, sock_room);
                         break;
-                    case 'h':
+                    case MESSAGE_HISTORY_GET_ACTION:
                     {
                         message_history(login, msg_child, sock_room);
                     }
                     break;
-                    case 'l':
+                    case MESSAGE_LIST_GET_ACTION:
                         message_list(login, sock_room);
                         break;
-                    case 'r':
+                    case MESSAGE_REICEVE_ACTION:
                         message_receive(login, msg_child, sock_room);
                         break;
 
-                    case 'k':
+                    case MESSAGE_KICK_ACTION:
                         message_kick(login, msg_child, sock_room, room);
                         break;
-                    case 'p':
+                    case MESSAGE_PRIVATE_ACTION:
                         message_private_chat(login, msg_child, sock_room, room);
                         break;
-                    case 'o': // joined out
+                    case MESSAGE_ROOM_OUT_ACTION: // joined out
                         message_join_out(login, sock_room, room);
                         // free(room);
                         // room = 0;
                         memset(room, 0, strlen(room));
                         break;
-                    case 'w':
+                    case MESSAGE_INVITE_ACTION:
                         message_invite_user(login, msg_child, sock_room, room);
                         break;
                     default:
