@@ -10,10 +10,9 @@ GtkWidget *ipEntry, *portEntry;
 GtkWidget *statusLabel;
 GtkWidget *loginButton;
 GtkWidget *loginWindow;
-pthread_t loginner;
 int logged_in;
 
-struct login_info //khuôn
+struct login_info // khuôn
 {
     const char *ip;
     const char *login;
@@ -23,10 +22,10 @@ struct login_info //khuôn
 
 void *login_thread(void *param)
 {
-    char *res = message_connect(((struct login_info *)param)->ip, ((struct login_info *)param)->iport); //connect to server
-    if(!res)
-        res = message_do_login(((struct login_info *)param)->login, ((struct login_info *)param)->password); //if success dang nhap
-    if(res)
+    char *res = message_connect(((struct login_info *)param)->ip, ((struct login_info *)param)->iport); // connect to server
+    if (!res)
+        res = message_do_login(((struct login_info *)param)->login, ((struct login_info *)param)->password); // if success dang nhap
+    if (res)
     {
         gtk_label_set_text(GTK_LABEL(statusLabel), res);
         message_disconnect();
@@ -34,7 +33,7 @@ void *login_thread(void *param)
     else
     {
         // init_chat_window(((struct login_info *)param)->login);
-        init_room_window(((struct login_info *)param)->login); //khoi dong màn hình room
+        init_room_window(((struct login_info *)param)->login); // khoi dong màn hình room
         logged_in = 1;
         free(param);
         return param;
@@ -46,37 +45,38 @@ void *login_thread(void *param)
 
 void do_login(GtkWidget *widget, gpointer data)
 {
-    (void) widget;
-    (void) data;
-    if(!gtk_widget_get_sensitive(loginButton))
+    pthread_t loginner;
+    (void)widget;
+    (void)data;
+    if (!gtk_widget_get_sensitive(loginButton))
         return;
     const gchar *ip, *port, *login, *password;
     login = gtk_entry_get_text(GTK_ENTRY(loginEntry));
-    if(!login || !*login)
+    if (!login || !*login)
     {
         gtk_widget_grab_focus(loginEntry);
         return;
     }
     password = gtk_entry_get_text(GTK_ENTRY(passwordEntry));
-    if(!password || !*password)
+    if (!password || !*password)
     {
         gtk_widget_grab_focus(passwordEntry);
         return;
     }
     ip = gtk_entry_get_text(GTK_ENTRY(ipEntry));
-    if(!ip || !*ip)
+    if (!ip || !*ip)
     {
         gtk_widget_grab_focus(ipEntry);
         return;
     }
     port = gtk_entry_get_text(GTK_ENTRY(portEntry));
-    if(!port || !*port)
+    if (!port || !*port)
     {
         gtk_widget_grab_focus(portEntry);
         return;
     }
     int iport;
-    if(!sscanf(port, "%d", &iport))
+    if (!sscanf(port, "%d", &iport))
     {
         gtk_label_set_text(GTK_LABEL(statusLabel), "Invalid port");
         return;
@@ -92,8 +92,8 @@ void do_login(GtkWidget *widget, gpointer data)
 
 gboolean check_login(void *param)
 {
-    (void) param;
-    if(logged_in)
+    (void)param;
+    if (logged_in)
     {
         gtk_widget_hide(loginWindow);
         gtk_widget_show_all(roomWindow);
@@ -107,23 +107,21 @@ void init_login_window()
 {
     GtkBuilder *builder = gtk_builder_new_from_file("./client/login.glade");
 
-    loginWindow = GTK_WIDGET(gtk_builder_get_object(builder,"loginWindow"));
-    g_signal_connect(loginWindow,"destroy", G_CALLBACK(gtk_main_quit),NULL);
+    loginWindow = GTK_WIDGET(gtk_builder_get_object(builder, "loginWindow"));
+    g_signal_connect(loginWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
+    loginEntry = GTK_WIDGET(gtk_builder_get_object(builder, "loginEntry"));
+    passwordEntry = GTK_WIDGET(gtk_builder_get_object(builder, "passwordEntry"));
+    g_signal_connect(G_OBJECT(loginEntry), "activate", G_CALLBACK(do_login), NULL);
+    g_signal_connect(G_OBJECT(passwordEntry), "activate", G_CALLBACK(do_login), NULL); // login
+    ipEntry = GTK_WIDGET(gtk_builder_get_object(builder, "ipEntry"));
+    portEntry = GTK_WIDGET(gtk_builder_get_object(builder, "portEntry"));
+    g_signal_connect(G_OBJECT(ipEntry), "activate", G_CALLBACK(do_login), NULL);
+    g_signal_connect(G_OBJECT(portEntry), "activate", G_CALLBACK(do_login), NULL);
 
-    loginEntry = GTK_WIDGET(gtk_builder_get_object(builder,"loginEntry"));
-    passwordEntry = GTK_WIDGET(gtk_builder_get_object(builder,"passwordEntry"));
-    g_signal_connect(G_OBJECT(loginEntry),"activate", G_CALLBACK(do_login),NULL);
-    g_signal_connect(G_OBJECT(passwordEntry),"activate", G_CALLBACK(do_login),NULL); //login
-    ipEntry = GTK_WIDGET(gtk_builder_get_object(builder,"ipEntry"));
-    portEntry = GTK_WIDGET(gtk_builder_get_object(builder,"portEntry"));
-    g_signal_connect(G_OBJECT(ipEntry),"activate", G_CALLBACK(do_login),NULL);
-    g_signal_connect(G_OBJECT(portEntry),"activate", G_CALLBACK(do_login),NULL);
-
-    statusLabel = GTK_WIDGET(gtk_builder_get_object(builder,"statusLabel"));
-    loginButton = GTK_WIDGET(gtk_builder_get_object(builder,"loginButton"));
-    g_signal_connect(G_OBJECT(loginButton),"clicked", G_CALLBACK(do_login),NULL);
+    statusLabel = GTK_WIDGET(gtk_builder_get_object(builder, "statusLabel"));
+    loginButton = GTK_WIDGET(gtk_builder_get_object(builder, "loginButton"));
+    g_signal_connect(G_OBJECT(loginButton), "clicked", G_CALLBACK(do_login), NULL);
     logged_in = 0;
     g_timeout_add(50, check_login, 0);
 }
-

@@ -73,13 +73,10 @@
     <columns>
       <!-- column-name login -->
       <column type="gchararray"/>
-      <!-- column-name id -->
-      <column type="gint"/>
     </columns>
     <data>
       <row>
         <col id="0" translatable="yes"/>
-        <col id="1">0</col>
       </row>
     </data>
   </object>
@@ -246,6 +243,7 @@
             <property name="can-focus">True</property>
             <property name="model">userListStore</property>
             <property name="headers-visible">False</property>
+            <property name="enable-search">False</property>
             <child internal-child="selection">
               <object class="GtkTreeSelection">
                 <property name="mode">none</property>
@@ -317,7 +315,6 @@
             <property name="can-focus">False</property>
             <attributes>
               <attribute name="weight" value="bold"/>
-              <attribute name="underline" value="True"/>
               <attribute name="foreground" value="#1c1c7171d8d8"/>
               <attribute name="underline-color" value="#f6f6f5f5f4f4"/>
             </attributes>

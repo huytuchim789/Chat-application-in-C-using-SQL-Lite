@@ -391,7 +391,8 @@ int message_receive_invite(char *content)
 }
 void message_joined_in(char *room)
 {
-    struct proto_message *p = proto_create('v', 1); // goi tin co type la i(login)
+    struct proto_message *p = proto_create('v', 1);
+    puts(room); // goi tin co type la i(login)
     proto_set_str(p, 0, room);                      // user
     _send(p);
 }

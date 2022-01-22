@@ -1,7 +1,7 @@
 #define _GNU_SOURCE
 
 #include "chat.h"
-#include "messages.h"
+#include "messages_chat.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,9 +25,8 @@ GtkWidget *inviteEntry;
 GtkWidget *dialog;
 GtkWidget *yesButton;
 GtkWidget *noButton;
-pthread_t watcher;
 int show_dialog;
-
+char a[20];
 #define REQUEST_HISTORY 10
 
 const char *HELP_STR = "\\l: list of active users, \\k ID REASON: kick (root only), \\p ID content:private chat by ID";
@@ -63,9 +62,9 @@ void add_list_user_online(char *body)
     }
     // gtk_adjustment_set_value(vAdjust, gtk_adjustment_get_upper(vAdjust) - gtk_adjustment_get_page_size(vAdjust)); // get scrolled
 }
-
 void do_send(GtkWidget *widget, gpointer *data)
 {
+    printf("do_send");
     if (!gtk_widget_get_sensitive(sendButton)) // when havent pressed buttton
         return;
     gtk_label_set_text(GTK_LABEL(statusLabel), ""); // default value
@@ -73,6 +72,7 @@ void do_send(GtkWidget *widget, gpointer *data)
     message = gtk_entry_get_text(GTK_ENTRY(sendEntry));
     if (!message || !*message)
         return;
+    // default value
     if (message[0] == '\\' && message[1])
     {
         if (message[1] == 'h' && (!message[2] || message[2] == ' ')) // get help
@@ -177,9 +177,15 @@ void *watcher_thread(void *param)
     char *author, *body;
     char timebuf[64];
     printf("His%s\n", (char *)param);
+    char *res = message_connect("127.0.0.1", 1339);
+    if (res)
+    {
+        gtk_label_set_text(GTK_LABEL(statusLabel), res);
+        message_disconnect();
+    }
     char *creator = message_room_leader((char *)param);
     char creatorLabel[256];
-    sprintf(creatorLabel,"Room Creator: %s",creator);
+    sprintf(creatorLabel, "Room Creator: %s", creator);
     gtk_label_set_text(GTK_LABEL(roomLeader), creatorLabel);
     message_request_history(REQUEST_HISTORY, (char *)param);
     while (1)
@@ -282,7 +288,7 @@ gboolean check_dialog(void *param)
 void init_chat_window(char *login, char *room)
 {
     GtkBuilder *builder = gtk_builder_new_from_file("./client/chat.glade");
-
+    pthread_t watcher;
     chatWindow = GTK_WIDGET(gtk_builder_get_object(builder, "chatWindow"));
     char buf[100] = "Group chat client: ";
     char wel[30];
@@ -314,7 +320,7 @@ void init_chat_window(char *login, char *room)
     noButton = GTK_WIDGET(gtk_builder_get_object(builder, "noButton"));
     g_signal_connect(G_OBJECT(noButton), "clicked", G_CALLBACK(no), NULL);
     vAdjust = gtk_scrolled_window_get_vadjustment(scrolledWindow);
-    pthread_create(&watcher, 0, watcher_thread, (void *)room);
+    pthread_create(&watcher, NULL, watcher_thread, (void *)room);
     show_dialog = 0;
     g_timeout_add(50, check_dialog, 0);
 }
