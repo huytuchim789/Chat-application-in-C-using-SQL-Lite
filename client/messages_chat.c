@@ -189,7 +189,7 @@ int message_receive(struct timeval *time, char **author, char **body)
         strcpy(*body, s2);
         char from[32];
         char content[128];
-        sscanf(*body, "%[^|]|%s", from, content);
+        sscanf(*body, "%[^|]|%[^\n]", from, content);
         sprintf(*body, "You received a message from %s (content: %s )", from, content);
         // strcpy(*body, "You have been received content: ");
         // strncat(*body, content, 256);

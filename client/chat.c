@@ -20,7 +20,7 @@ GtkScrolledWindow *scrolledWindow;
 GtkListStore *messagesListStore;
 GtkListStore *userListStore;
 GtkWidget *inviteEntry;
-
+GtkWidget *stack1;
 // dialog
 GtkWidget *dialog;
 GtkWidget *yesButton;
@@ -300,6 +300,7 @@ void init_chat_window(char *login, char *room)
     sendEntry = GTK_WIDGET(gtk_builder_get_object(builder, "sendEntry"));
     inviteEntry = GTK_WIDGET(gtk_builder_get_object(builder, "inviteEntry"));
     sendButton = GTK_WIDGET(gtk_builder_get_object(builder, "sendButton"));
+    stack1 = GTK_WIDGET(gtk_builder_get_object(builder, "stack1"));
     g_signal_connect(G_OBJECT(sendEntry), "activate", G_CALLBACK(do_send), (gpointer *)room);
     g_signal_connect(G_OBJECT(inviteEntry), "activate", G_CALLBACK(do_invite), (gpointer *)room);
     g_signal_connect(G_OBJECT(sendButton), "clicked", G_CALLBACK(do_send), (gpointer *)room);
@@ -321,6 +322,9 @@ void init_chat_window(char *login, char *room)
     g_signal_connect(G_OBJECT(noButton), "clicked", G_CALLBACK(no), NULL);
     vAdjust = gtk_scrolled_window_get_vadjustment(scrolledWindow);
     pthread_create(&watcher, NULL, watcher_thread, (void *)room);
+
+    //stack
+    gtk_stack_set_visible_child_name((GtkStack *)stack1,(void *)room);
     show_dialog = 0;
     g_timeout_add(50, check_dialog, 0);
 }
