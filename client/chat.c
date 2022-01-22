@@ -324,7 +324,7 @@ void init_chat_window(char *login, char *room)
     pthread_create(&watcher, NULL, watcher_thread, (void *)room);
 
     //stack
-    gtk_stack_set_visible_child_name((GtkStack *)stack1,(void *)room);
+    // gtk_stack_set_visible_child_name((GtkStack *)stack1,(void *)room);
     show_dialog = 0;
     g_timeout_add(50, check_dialog, 0);
 }

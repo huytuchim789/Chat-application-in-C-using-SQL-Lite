@@ -151,6 +151,7 @@ void message_send(char kind, struct timeval time, const char *login, const char 
         proto_set_timeval(p, 0, &time);
         proto_set_str(p, 1, login);
         proto_set_str(p, 2, body);
+        puts(body);
         _send(p, sock);
         // shutdown(sock, 2);
     }

@@ -8,6 +8,7 @@
     "stdio.h": "c",
     "room.h": "c",
     "aes.h": "c",
-    "time.h": "c"
+    "time.h": "c",
+    "getopt.h": "c"
   }
 }

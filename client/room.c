@@ -19,6 +19,7 @@ GtkWidget *dialog;
 GtkWidget *yesButton;
 GtkWidget *noButton;
 int room_in;
+int show_window;
 int hide_dialog;
 struct roomer_info
 {
@@ -139,8 +140,7 @@ gboolean check_room(void *param)
     (void)param;
     if (room_in)
     {
-        // gtk_widget_hide(roomWindow);
-        gtk_widget_show(chatWindow);
+        gtk_widget_show_all(chatWindow);
         room_in = 0;
     }
     return G_SOURCE_CONTINUE;
